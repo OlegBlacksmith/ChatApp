@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Hubs
 {
