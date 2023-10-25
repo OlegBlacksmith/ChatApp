@@ -9,6 +9,7 @@ const App = () => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [messages, setMessages] = useState<{ user: string; message: string }[]>([]);
   const [users, setUsers] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<string[]>([]);
 
   const joinRoom = async (user: string, room: string) => {
     try {
@@ -25,19 +26,26 @@ const App = () => {
         setUsers(users);
       });
 
+      newConnection.on('ReceiveChatRooms', (rooms: string[]) => {
+        setRooms(rooms);
+      });
+
       newConnection.onclose(e => {
         setConnection(null);
         setMessages([]);
         setUsers([]);
+        setRooms([]);
       });
 
       await newConnection.start();
       await newConnection.invoke("JoinRoom", { user, room });
       setConnection(newConnection);
+      await newConnection.invoke("SendChatRooms", {rooms});
     } catch (e) {
       console.log(e);
     }
   };
+  
 
   const sendMessage = async (message: string): Promise<void> => {
     try {
@@ -67,7 +75,7 @@ const App = () => {
         {!connection
         ? <Lobby joinRoom={joinRoom} />
         : <Chat messages={messages} sendMessage={sendMessage} 
-            closeConnection={closeConnection} users={users} />}
+            closeConnection={closeConnection} users={users} rooms={rooms}/>}
       </div>
     </div>
   );

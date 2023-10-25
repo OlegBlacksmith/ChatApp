@@ -1,5 +1,6 @@
 import ConnectedUsers from './ConnectedUsers';
 import MessageContainer from './MessageContainer';
+//import RoomsList from './RoomsList';
 import SendMessageForm from './SendMessageForm';
 
 interface Message {
@@ -12,9 +13,10 @@ interface ChatProps {
   sendMessage: (message: string) => Promise<void>;
   closeConnection: () => Promise<void>;
   users: string[];
+  rooms: string[];
 }
 
-const Chat: React.FC<ChatProps> = ({ messages, sendMessage, closeConnection, users }) =>
+const Chat: React.FC<ChatProps> = ({ messages, sendMessage, closeConnection, users, rooms }) =>
     <div className='text-right'>
             <div className='mb-1 mt-1'>
         <button
@@ -27,6 +29,7 @@ const Chat: React.FC<ChatProps> = ({ messages, sendMessage, closeConnection, use
           🔙
         </button>
       </div>
+      
       <ConnectedUsers users={users}/>
       <div className="grid">
         <MessageContainer messages={messages} />

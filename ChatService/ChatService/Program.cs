@@ -3,6 +3,8 @@ using ChatService.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(builder =>
     {
@@ -16,17 +18,19 @@ builder.Services.AddCors(options => {
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>
         (opts => new Dictionary<string, UserConnection>());
 
+
 builder.Services.AddSignalR();
 
 var app = builder.Build();
+
+//app.UseAuthentication ();
 
 app.UseRouting();
 
 app.UseCors();
 
-app.UseEndpoints(endpoints => 
-{
-    endpoints.MapHub<ChatHub>("/chat");
-});
+app.MapHub<ChatHub>("/chat");
+
+//app.UseAuthorization();
 
 app.Run();
