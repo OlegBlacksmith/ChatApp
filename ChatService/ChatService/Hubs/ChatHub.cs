@@ -49,13 +49,13 @@ namespace ChatService.Hubs
             await SendConnectedUsers(userConnection.Room);
         }
 
-        public Task SendConnectedUsers(string room) 
+        public async Task SendConnectedUsers(string room) 
         {
             var users = _connections.Values
                 .Where(c => c.Room == room)
                 .Select(c => c.User);
 
-            return Clients.Group(room).SendAsync("UsersInRoom", users);
+            await Clients.Group(room).SendAsync("UsersInRoom", users);
         }
     }
 }
