@@ -5,7 +5,7 @@ namespace ChatService.Services
 {
     public interface ITokenService
     {
-        string CreateToken(User user, List<IdentityRole<long>> role);
+        string CreateToken(User user, List<string> role);
 
     };
 

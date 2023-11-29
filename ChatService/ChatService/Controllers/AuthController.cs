@@ -16,16 +16,18 @@ namespace ChatService.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _context;
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
 
-        public AuthController(ITokenService tokenService, DataContext context, UserManager<User> userManager, IConfiguration configuration)
+        public AuthController(ITokenService tokenService, DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _tokenService = tokenService;
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         //login in for all users
@@ -56,12 +58,13 @@ namespace ChatService.Controllers
             if (user is null)
                 return Unauthorized();
 
-            var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId).ToListAsync();
-            var roles = _context.Roles.Where(x => roleIds.Contains(x.Id)).ToList();
+            /*var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId).ToListAsync();
+            var roles = _context.Roles.Where(x => roleIds.Contains(x.Id)).ToList();*/
+            var roles = await _userManager.GetRolesAsync(user);
 
             var accessToken = _tokenService.CreateToken(user, roles);
-            user.RefreshToken = _configuration.GenerateRefreshToken();
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_configuration.GetSection("Jwt:RefreshTokenValidityInDays").Get<int>());
+            var refreshToken = _configuration.GenerateRefreshToken();
+            //user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_configuration.GetSection("Jwt:RefreshTokenValidityInDays").Get<int>());
 
             await _context.SaveChangesAsync();
 
@@ -70,7 +73,7 @@ namespace ChatService.Controllers
                 Username = user.UserName!,
                 Email = user.Email!,
                 Token = accessToken,
-                RefreshToken = user.RefreshToken
+                RefreshToken = refreshToken
             });
         }
 

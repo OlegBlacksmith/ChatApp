@@ -76,9 +76,10 @@ builder.Services.AddAuthorization(options => options.DefaultPolicy =
             (JwtBearerDefaults.AuthenticationScheme)
         .RequireAuthenticatedUser()
         .Build());
-builder.Services.AddIdentity<User, IdentityRole<long>>()
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
     .AddUserManager<UserManager<User>>()
+    .AddRoleManager<IdentityRole>()
     .AddSignInManager<SignInManager<User>>();
 
 

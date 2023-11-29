@@ -14,7 +14,7 @@ namespace ChatService.Services
             _configuration = configuration;
         }
 
-        public string CreateToken(User user, List<IdentityRole<long>> roles)
+        public string CreateToken(User user, List<string> roles)
         {
             var token = user
                 .CreateClaims(roles)
