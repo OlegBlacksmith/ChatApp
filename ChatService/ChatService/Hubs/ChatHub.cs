@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Hubs
 {
@@ -17,12 +16,18 @@ namespace ChatService.Hubs
         public override Task OnDisconnectedAsync(Exception? exception)
         {
             if (_connections.TryGetValue(Context.ConnectionId, 
-                out UserConnection userConnection)) 
+                out UserConnection? userConnection)) 
             {
                 _connections.Remove(Context.ConnectionId);
-                Clients.Group(userConnection.Room).
-                    SendAsync("ReceiveMessage", _botUser, $"{userConnection.User} has left the room");
-
+                if (userConnection != null) 
+                { 
+                    if (userConnection.Room != null) 
+                    {
+                        Clients.
+                            Group(userConnection.Room).
+                            SendAsync("ReceiveMessage", _botUser, $"{userConnection.User} has left the room");
+                    }
+                }
                 SendConnectedUsers(userConnection.Room);
             }
             return base.OnDisconnectedAsync(exception);
@@ -30,7 +35,7 @@ namespace ChatService.Hubs
 
         public async Task SendMessage(string message) 
         {
-            if(_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            if(_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
             {
                 await Clients.Group(userConnection.Room)
                     .SendAsync("ReceiveMessage", userConnection.User, message);
